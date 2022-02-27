@@ -6,6 +6,8 @@ A set of useful tools commonly used in development.
 Timer for easy creation and use. It is possible to restart an already running timer, start the timer again after the end. It is possible to loop the start of timers and set the maximum number of repetitions.
 ### Example:
 ```javascript
+import { Timer } from '@sid-max1996/utility';
+
 Timer.create(() => {
   console.log('timer work');
 }, 100, {
@@ -28,6 +30,8 @@ Timer.create(() => {
 ```
 ### Repeationg timer example:
 ```javascript
+import { Timer } from '@sid-max1996/utility';
+
 Timer.create(() => {
   console.log('timer work'); // it works 6 times
 }, 100, {
@@ -51,6 +55,8 @@ timer.start();
 
 ### Endlessly timer example:
 ```javascript
+import { Timer } from '@sid-max1996/utility';
+
 const timer = Timer.create(() => {
   console.log('timer work');
 }, 100, { endlessly: true });
@@ -68,13 +74,32 @@ timer1.start();
 
 ### Timer wait example:
 ```javascript
+import { Timer } from '@sid-max1996/utility';
+
 (async () => {
   await Timer.wait(3000);
   console.log('timer work'); // work after 3s
 })();
 ```
 
+## Stopwatch
+Stopwatch with accurate time with the ability to pause and resume. Can be used to measure the execution time of operations.
+### Example:
+```javascript
+import { Stopwatch, Timer } from '@sid-max1996/utility';
+
+(async () => {
+  const stopwatch = Stopwatch.create();
+  stopwatch.start();
+  await Timer.wait(100);
+  const pauseTime = stopwatch.pause();
+  console.log(`pauseTime: ${pauseTime} == elapsedTime: ${stopwatch.elapsedTime}`);
+  await Timer.wait(100);
+  const stopTime = stopwatch.stop();
+  console.log(`stopTime: ${stopTime} == elapsedTime: ${stopwatch.elapsedTime}`);
+})();
+```
+
 ## Roadmap
-Stopwatch - to measure the execution time of a function call <br />
 Slides - in order to take elements from the array in turn, at the end start over <br />
 Cycle - delayed and stopped wrapper to while(true) or requestAnimationFrame
