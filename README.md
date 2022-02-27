@@ -100,6 +100,28 @@ import { Stopwatch, Timer } from '@sid-max1996/utility';
 })();
 ```
 
+## Slides
+Slides is a convenient passage through the array, when we reach the end, we start over. It is also possible to set the position.
+### Example:
+```javascript
+import { Slides, Timer } from '@sid-max1996/utility';
+
+const slides = Slides.create([1, 2, 3, 4, 5]);
+
+(async () => {
+  while (true) {
+    const slide = slides.current;
+    const currentSlide = slides.next(); // next() return current slide
+    const nextSlide = slides.current; // after next() current slide changed
+    console.log(`current slide: ${slide} === currentSlide: ${currentSlide}, nextSlide: ${nextSlide}`);
+    if (slides.position === 3) { // skip 4 slide
+      console.log('skip 4 slide');
+      slides.set(slides.position + 1); // go to 5 slide
+    }
+    await Timer.wait(1000);
+  }
+})();
+```
+
 ## Roadmap
-Slides - in order to take elements from the array in turn, at the end start over <br />
 Cycle - delayed and stopped wrapper to while(true) or requestAnimationFrame
