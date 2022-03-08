@@ -1,6 +1,6 @@
 {
   "name": "@sid-max1996/utility",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "A set of useful tools commonly used in development.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -8,7 +8,8 @@
     "dist/**/*"
   ],
   "scripts": {
-    "test": "jest --config jest-jsdom.json && jest --config jest-node.json",
+    "test": "jest --config jest-node.json",
+    "test:jsdom": "jest --config jest-jsdom.json",
     "build": "tsc",
     "prepare": "npm run build",
     "prepublishOnly": "npm test && npm run lint",

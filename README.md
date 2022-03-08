@@ -122,6 +122,51 @@ const slides = Slides.create([1, 2, 3, 4, 5]);
   }
 })();
 ```
+## Dropper
+Discards calls to a function if it is in progress.
 
-## Roadmap
-Cycle - delayed and stopped wrapper to while(true) or requestAnimationFrame
+### All possible params:
+```javascript
+{
+  runLastDroppedInTheEnd?: boolean; // run last dropped in the end
+  notWaitAsyncTask?: boolean; // do not wait for the async callback
+}
+```
+### Example:
+```javascript
+import { Dropper, Timer } from '@sid-max1996/utility';
+
+(async () => {
+  let lastValue = 0;
+  console.log(`dropper1 drop if in proccess`);
+  const dropper1 = Dropper.create(async (value) => {
+    lastValue = value;
+    await Timer.wait(10);
+  });
+  dropper1.execute(1);
+  console.log(`dropper1 execute(1) 1 changed lastValue: ${lastValue}`);
+  dropper1.execute(2);
+  console.log(`dropper1 execute(2) 2 dropped lastValue: ${lastValue}`);
+  dropper1.execute(3);
+  console.log(`dropper1 execute(3) 3 dropped lastValue: ${lastValue}`);
+  await Timer.wait(50);
+  console.log(`dropper1 wait 50ms`);
+  dropper1.execute(4);
+  console.log(`dropper1 execute(4) 4 changed lastValue: ${lastValue}`);
+  console.log(`-----------------------------------------------------`);
+  lastValue = 0;
+  console.log(`dropper2 drop if in proccess and run last dropped in the end`);
+  const dropper2 = Dropper.create(async (value) => {
+    lastValue = value;
+    await Timer.wait(10);
+  }, { runLastDroppedInTheEnd: true });
+  dropper2.execute(1);
+  console.log(`dropper2 execute(1) 1 changed lastValue: ${lastValue}`);
+  dropper2.execute(2);
+  console.log(`dropper2 execute(2) 2 next lastValue: ${lastValue}`);
+  dropper2.execute(3);
+  console.log(`dropper2 execute(3) 3 next 2 dropped lastValue: ${lastValue}`);
+  await Timer.wait(50);
+  console.log(`dropper2 wait 50ms 3 changed lastValue: ${lastValue}`);
+})();
+```
