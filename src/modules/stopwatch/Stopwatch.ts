@@ -1,18 +1,20 @@
-import { getPerformance } from './performance';
+export interface IPerformance {
+  now(): number;
+}
 
 export default class Stopwatch {
-  private performance: { now(): number } | null = null;
+  private performance: IPerformance;
   private pausedTime: number = 0;
   private startTime: number = 0;
   private _elapsedTime: number = 0;
   private stoped: boolean = true;
 
-  constructor() {
-    this.performance = getPerformance();
+  constructor(performance: IPerformance) {
+    this.performance = performance;
   }
 
-  public static create(): Stopwatch {
-    return new Stopwatch();
+  public static create(performance: IPerformance): Stopwatch {
+    return new Stopwatch(performance);
   }
 
   public get elapsedTime(): number {
@@ -21,11 +23,7 @@ export default class Stopwatch {
 
   public start(): void {
     this.stoped = false;
-    if (this.performance) {
-      this.startTime = this.performance.now();
-    } else {
-      this.startTime = Date.now();
-    }
+    this.startTime = this.performance.now();
   }
 
   public clear(): void {
@@ -41,22 +39,12 @@ export default class Stopwatch {
     this.start();
   }
 
-  private getNowTime(): number {
-    let nowTime: number = 0;
-    if (this.performance) {
-      nowTime = this.performance.now();
-    } else {
-      nowTime = Date.now();
-    }
-    return nowTime;
-  }
-
   public pause(): number {
     if (this.stoped) {
       this._elapsedTime = 0;
       return this._elapsedTime;
     }
-    const nowTime = this.getNowTime();
+    const nowTime = this.performance.now();
     this.pausedTime += nowTime - this.startTime;
     this.startTime = 0;
     this._elapsedTime = this.pausedTime;
@@ -68,7 +56,7 @@ export default class Stopwatch {
       this._elapsedTime = 0;
       return this._elapsedTime;
     }
-    const nowTime = this.getNowTime();
+    const nowTime = this.performance.now();
     this._elapsedTime = nowTime - this.startTime + this.pausedTime;
     this.startTime = 0;
     this.pausedTime = 0;

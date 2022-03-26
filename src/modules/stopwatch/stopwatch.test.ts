@@ -1,8 +1,24 @@
 import Stopwatch from './Stopwatch';
-import { getPerformance } from './performance';
+import { IPerformance } from "./Stopwatch";
 
-const stopwatch = Stopwatch.create();
-const performance = getPerformance(); 
+function getPerformance(): IPerformance {
+  let performance: IPerformance = {
+    now: Date.now
+  };
+  if (typeof window !== 'undefined' && window.performance) {
+    performance = window.performance;
+  } else if (process?.versions?.node) {
+    const NODE_MAJOR_VERSION = Number(process.versions.node.split('.')[0]);
+    const NODE_MINOR_VERSION = Number(process.versions.node.split('.')[1]);
+    if ((NODE_MAJOR_VERSION === 8 && NODE_MINOR_VERSION >= 5) || NODE_MAJOR_VERSION > 8) {
+      performance = require('perf_hooks').performance;
+    }
+  }
+  return performance;
+}
+
+const performance = getPerformance();
+const stopwatch = Stopwatch.create(performance);
 
 afterEach(() => {
   stopwatch.clear();

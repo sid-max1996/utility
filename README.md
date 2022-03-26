@@ -89,7 +89,9 @@ Stopwatch with accurate time with the ability to pause and resume. Can be used t
 import { Stopwatch, Timer } from '@sid-max1996/utility';
 
 (async () => {
-  const stopwatch = Stopwatch.create();
+  const stopwatch = Stopwatch.create(performance); // For browser
+  // const stopwatch = Stopwatch.create(require('perf_hooks').performance); // For nodejs
+  // const stopwatch = Stopwatch.create({ now: Date.now }); // For both less accurate!!!
   stopwatch.start();
   await Timer.wait(100);
   const pauseTime = stopwatch.pause();
