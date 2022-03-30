@@ -1,6 +1,8 @@
 interface ITimerParams {
   startImmediately?: boolean // start timer immediately
+  instantStart?: boolean // short alias for startImmediately
   firstRunImmediately?: boolean // first run of the timer function immediately
+  instantExecute?: boolean // short alias for firstRunImmediately
   repeatCount?: number // how many times to repeat the timer function call
   endlessly?: boolean // repeat timert function call endlessly
   notWaitAsyncTask?: boolean // do not wait for the async timer function to complete before starting the next timer
@@ -32,7 +34,9 @@ export default class Timer {
     if (typeof this.params.repeatCount === 'number' && this.params.repeatCount < 0) {
       throw new Error('Timer repeatCount < 0');
     }
-    this.init();
+    if (this.params.startImmediately || this.params.instantStart) {
+      this.start();
+    }
   }
   /**
    * Create Timer instance without new keyword
@@ -70,16 +74,6 @@ export default class Timer {
    */
   get repeatCount(): number {
     return this._repeatCount ?? 0;
-  }
-
-  private async init() {
-    if (this.params.firstRunImmediately) {
-      await this.runCallback();
-      if (!this.launched) return;
-    }
-    if (this.params.startImmediately) {
-      this.start();
-    }
   }
 
   /**
@@ -140,14 +134,22 @@ export default class Timer {
     }
   }
 
-  private runTimeout () {
-    clearTimeout(this.timeoutId);
-    this.timeoutId = setTimeout(this.callbackWrapper.bind(this), this.time);
+  private async runTimeout (first: boolean = false) {
+    if (first && (this.params.firstRunImmediately || this.params.instantExecute)) {
+      this.callbackWrapper();
+    } else {
+      clearTimeout(this.timeoutId);
+      this.timeoutId = setTimeout(this.callbackWrapper.bind(this), this.time);
+    }
+  }
+
+  get method(): Function {
+    return this.callback;
   }
 
   start () {
     this.launched = true;
-    this.runTimeout();
+    this.runTimeout(true);
   }
 
   stop () {

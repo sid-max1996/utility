@@ -18,7 +18,9 @@ Timer.create(() => {
 ```javascript
 {
   startImmediately?: boolean // start timer immediately
+  instantStart?: boolean // short alias for startImmediately
   firstRunImmediately?: boolean // first run of the timer function immediately
+  instantExecute?: boolean // short alias for firstRunImmediately
   repeatCount?: number // how many times to repeat the timer function call
   endlessly?: boolean // repeat timert function call endlessly
   notWaitAsyncTask?: boolean // do not wait for the async timer function to complete before starting the next timer
@@ -70,6 +72,12 @@ const timer1 = Timer.create(() => {
   firstRunImmediately: true // first work immediately, next after 100ms
 });
 timer1.start();
+
+const timer2 = Timer.create(() => {
+  console.log('timer1 work');
+}, 100);
+timer2.method(); // run timer method immediately
+timer2.start(); // start timer that will work after 100ms 
 ```
 
 ### Timer wait example:
