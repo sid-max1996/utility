@@ -7,7 +7,7 @@ afterEach(() => {
   lastValue = 0;
 });
 
-test('ExecuteDropper without params', async () => {
+test('Dropper without params', async () => {
   const dropper = Dropper.create(async (value: number) => {
     lastValue = value;
     await Timer.wait(10);
@@ -24,7 +24,7 @@ test('ExecuteDropper without params', async () => {
   expect(lastValue).toBe(4);
 });
 
-test('ExecuteDropper notWaitAsyncTask', async () => {
+test('Dropper notWaitAsyncTask', async () => {
   const dropper = Dropper.create(async (value: number) => {
     lastValue = value;
     await Timer.wait(10);
@@ -37,7 +37,7 @@ test('ExecuteDropper notWaitAsyncTask', async () => {
   expect(lastValue).toBe(3);
 });
 
-test('ExecuteDropper runLastDroppedInTheEnd', async () => {
+test('Dropper runLastDroppedInTheEnd', async () => {
   const dropper = Dropper.create(async (value: number) => {
     lastValue = value;
     await Timer.wait(10);
@@ -49,5 +49,24 @@ test('ExecuteDropper runLastDroppedInTheEnd', async () => {
   dropper.execute(3);
   expect(lastValue).toBe(1);
   await Timer.wait(50);
+  expect(lastValue).toBe(3);
+});
+
+test('Dropper errors', async () => {
+  const dropper = Dropper.create((value: number) => {
+    lastValue = value;
+    throw new Error(`Test error ${value}`);
+  });
+  try {
+    dropper.execute(1);
+  } catch (err) {}
+  expect(lastValue).toBe(1);
+  try {
+    dropper.execute(2);
+  } catch (err) {}
+  expect(lastValue).toBe(2);
+  try {
+    dropper.execute(3);
+  } catch (err) {}
   expect(lastValue).toBe(3);
 });

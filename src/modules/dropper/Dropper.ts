@@ -28,14 +28,17 @@ export default class Dropper {
         return;
       }
       running = true;
-      const res = callback(...args);
-      if (res instanceof Promise && !params.notWaitAsyncTask) {
-        await res;
-      }
-      running = false;
-      if (params.runLastDroppedInTheEnd && lastDroppedArgs) {
-        func(lastDroppedArgs);
-        lastDroppedArgs = null;
+      try {
+        const res = callback(...args);
+        if (res instanceof Promise && !params.notWaitAsyncTask) {
+          await res;
+        }
+      } finally {
+        running = false;
+        if (params.runLastDroppedInTheEnd && lastDroppedArgs) {
+          func(lastDroppedArgs);
+          lastDroppedArgs = null;
+        }
       }
     }
     return func;
