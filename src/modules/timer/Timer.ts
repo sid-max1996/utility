@@ -1,3 +1,5 @@
+import { autoBind } from "../../lib/util"
+
 interface ITimerParams {
   startImmediately?: boolean // start timer immediately
   instantStart?: boolean // short alias for startImmediately
@@ -37,6 +39,7 @@ export default class Timer {
     if (this.params.startImmediately || this.params.instantStart) {
       this.start();
     }
+    autoBind(this);
   }
   /**
    * Create Timer instance without new keyword
@@ -85,18 +88,21 @@ export default class Timer {
       const res = this.callback();
       if (res instanceof Promise) {
         if (!this.params.notWaitAsyncTask) {
-          await res;
+          const value = await res;
+          if (this.params.stopOnSuccess || (this.params.stopOnTrue && value === true)) {
+            this.stop();
+          }
         } else {
           res.then(value => {
             if (this.params.stopOnSuccess || (this.params.stopOnTrue && value === true)) {
               this.stop();
             }
           }).catch(err => {
-            if (!this.params.noThrowError) {
-             throw err;
-            }
             if (this.params.stopOnError) {
               this.stop();
+            }
+            if (!this.params.noThrowError) {
+             throw err;
             }
           });
         }
@@ -104,11 +110,11 @@ export default class Timer {
         this.launched = false;
       }
     } catch (err) {
-      if (!this.params.noThrowError) {
-        throw err;
-      }
       if (this.params.stopOnError) {
         this.launched = false;
+      }
+      if (!this.params.noThrowError) {
+        throw err;
       }
     }
   }

@@ -1,3 +1,5 @@
+import { autoBind } from "../../lib/util";
+
 interface DropperParams {
   runLastDroppedInTheEnd?: boolean; // run last dropped in the end
   notWaitAsyncTask?: boolean; // do not wait for the async callback
@@ -11,6 +13,7 @@ export default class Dropper {
 
   constructor(callback: Function, params: DropperParams = {}) {
     this.dropperFunction = this.createDropperFunction(callback, params);
+    autoBind(this);
   }
 
   public static create(callback: Function, params: DropperParams = {}): Dropper {

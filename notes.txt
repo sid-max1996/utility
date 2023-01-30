@@ -1,0 +1,2 @@
+1) return in package.json when I fix the tests
+"prepublishOnly": "npm test && npm run lint"

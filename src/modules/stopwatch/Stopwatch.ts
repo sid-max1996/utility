@@ -1,3 +1,5 @@
+import { autoBind } from "../../lib/util";
+
 export interface IPerformance {
   now(): number;
 }
@@ -11,9 +13,10 @@ export default class Stopwatch {
 
   constructor(performance: IPerformance) {
     this.performance = performance;
+    autoBind(this);
   }
 
-  public static create(performance: IPerformance): Stopwatch {
+  public static create(performance: IPerformance = { now: Date.now }): Stopwatch {
     return new Stopwatch(performance);
   }
 

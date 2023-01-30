@@ -1,9 +1,12 @@
+import { autoBind } from "../../lib/util";
+
 export default class Slides {
   private slides: any[];
   private index: number = 0;
 
   constructor(slides: any[]) {
     this.slides = slides;
+    autoBind(this);
   }
   /**
    * Get current position
