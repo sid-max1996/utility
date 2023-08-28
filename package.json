@@ -13,6 +13,7 @@
     "clean": "rimraf dist",
     "build": "npm run clean && tsc",
     "prepare": "npm run build",
+    "prepublishOnly": "npm test && npm run lint",
     "preversion": "npm run lint",
     "version": "npm run format && git add -A src",
     "postversion": "git push && git push --tags",
