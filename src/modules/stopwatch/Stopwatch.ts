@@ -1,4 +1,4 @@
-import { autoBind } from "../../lib/util";
+import { autoBind } from '../../lib/util';
 
 export interface IPerformance {
   now(): number;
@@ -10,6 +10,7 @@ export default class Stopwatch {
   private startTime: number = 0;
   private _elapsedTime: number = 0;
   private stoped: boolean = true;
+  private paused: boolean = false;
 
   constructor(performance: IPerformance) {
     this.performance = performance;
@@ -21,11 +22,15 @@ export default class Stopwatch {
   }
 
   public get elapsedTime(): number {
-    return this._elapsedTime;
+    if (this.stoped || this.paused) {
+      return this._elapsedTime;
+    }
+    return this._calcElapsedTime();
   }
 
   public start(): void {
     this.stoped = false;
+    this.paused = false;
     this.startTime = this.performance.now();
   }
 
@@ -34,7 +39,7 @@ export default class Stopwatch {
     this.pausedTime = 0;
     this.startTime = 0;
     this.stoped = true;
-    
+    this.paused = false;
   }
 
   public restart(): void {
@@ -47,11 +52,16 @@ export default class Stopwatch {
       this._elapsedTime = 0;
       return this._elapsedTime;
     }
-    const nowTime = this.performance.now();
-    this.pausedTime += nowTime - this.startTime;
+    this.paused = true;
+    this.pausedTime = this._calcElapsedTime();
     this.startTime = 0;
     this._elapsedTime = this.pausedTime;
     return this._elapsedTime;
+  }
+
+  private _calcElapsedTime() {
+    const nowTime = this.performance.now();
+    return nowTime - this.startTime + this.pausedTime;
   }
 
   public stop(): number {
@@ -59,8 +69,7 @@ export default class Stopwatch {
       this._elapsedTime = 0;
       return this._elapsedTime;
     }
-    const nowTime = this.performance.now();
-    this._elapsedTime = nowTime - this.startTime + this.pausedTime;
+    this._elapsedTime = this._calcElapsedTime();
     this.startTime = 0;
     this.pausedTime = 0;
     this.stoped = true;

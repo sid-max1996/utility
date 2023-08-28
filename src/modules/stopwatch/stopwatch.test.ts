@@ -1,36 +1,32 @@
 import Stopwatch from './Stopwatch';
-import { IPerformance } from "./Stopwatch";
+import { IPerformance } from './Stopwatch';
 
-function getPerformance(): IPerformance {
-  let performance: IPerformance = {
-    now: Date.now
-  };
-  if (typeof window !== 'undefined' && window.performance) {
-    performance = window.performance;
-  } else if (process?.versions?.node) {
-    const NODE_MAJOR_VERSION = Number(process.versions.node.split('.')[0]);
-    const NODE_MINOR_VERSION = Number(process.versions.node.split('.')[1]);
-    if ((NODE_MAJOR_VERSION === 8 && NODE_MINOR_VERSION >= 5) || NODE_MAJOR_VERSION > 8) {
-      performance = require('perf_hooks').performance;
-    }
+class MockPerformance implements IPerformance {
+  private time = 0;
+
+  now() {
+    return this.time;
   }
-  return performance;
+
+  add(time: number) {
+    this.time += time;
+  }
+
+  clear() {
+    this.time = 0;
+  }
 }
 
-const performance = getPerformance();
+const performance = new MockPerformance();
 const stopwatch = Stopwatch.create(performance);
 
 afterEach(() => {
   stopwatch.clear();
+  performance.clear();
 });
 
-function sleep (time: number) {
-  let diffTime = 0;
-  const startTime = performance ? performance.now() : Date.now();
-  while(diffTime < time) {
-    const nowTime = performance ? performance.now() : Date.now();
-    diffTime = nowTime - startTime;
-  }
+function sleep(time: number) {
+  performance.add(time);
 }
 
 test('stopwatch stop', async () => {
@@ -103,5 +99,17 @@ test('stopwatch restart', async () => {
   elapsedTime = stopwatch.stop();
   expect(elapsedTime).toBeGreaterThan(5);
   expect(elapsedTime).toBeLessThan(15);
+  expect(elapsedTime).toEqual(stopwatch.elapsedTime);
+});
+
+test('stopwatch elapsedTime', async () => {
+  stopwatch.start();
+  sleep(10);
+  expect(stopwatch.elapsedTime).toBe(10);
+  sleep(10);
+  expect(stopwatch.elapsedTime).toBe(20);
+  sleep(5);
+  const elapsedTime = stopwatch.stop();
+  expect(elapsedTime).toBe(25);
   expect(elapsedTime).toEqual(stopwatch.elapsedTime);
 });
