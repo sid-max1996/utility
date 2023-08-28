@@ -25,10 +25,13 @@ test('Dropper without params', async () => {
 });
 
 test('Dropper notWaitAsyncTask', async () => {
-  const dropper = Dropper.create(async (value: number) => {
-    lastValue = value;
-    await Timer.wait(10);
-  }, { notWaitAsyncTask: true });
+  const dropper = Dropper.create(
+    async (value: number) => {
+      lastValue = value;
+      await Timer.wait(10);
+    },
+    { notWaitAsyncTask: true },
+  );
   dropper.execute(1);
   expect(lastValue).toBe(1);
   dropper.execute(2);
@@ -38,10 +41,13 @@ test('Dropper notWaitAsyncTask', async () => {
 });
 
 test('Dropper runLastDroppedInTheEnd', async () => {
-  const dropper = Dropper.create(async (value: number) => {
-    lastValue = value;
-    await Timer.wait(10);
-  }, { runLastDroppedInTheEnd: true });
+  const dropper = Dropper.create(
+    async (value: number) => {
+      lastValue = value;
+      await Timer.wait(10);
+    },
+    { runLastDroppedInTheEnd: true },
+  );
   dropper.execute(1);
   expect(lastValue).toBe(1);
   dropper.execute(2);
@@ -57,16 +63,11 @@ test('Dropper errors', async () => {
     lastValue = value;
     throw new Error(`Test error ${value}`);
   });
-  try {
-    dropper.execute(1);
-  } catch (err) {}
-  expect(lastValue).toBe(1);
-  try {
-    dropper.execute(2);
-  } catch (err) {}
-  expect(lastValue).toBe(2);
-  try {
-    dropper.execute(3);
-  } catch (err) {}
-  expect(lastValue).toBe(3);
+
+  for (let num = 1; num <= 3; num++) {
+    await expect(async () => {
+      await dropper.execute(num);
+    }).rejects.toThrow(Error);
+    expect(lastValue).toBe(num);
+  }
 });
